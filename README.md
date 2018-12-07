@@ -1,0 +1,2 @@
+# MAST CI Packages
+This repository contains pre-built packages of dependencies that are used in MAST continuous integration (CI) builds/tests. The repository also contains scripts that are utilized to build the packages on various platforms.
