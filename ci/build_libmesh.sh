@@ -12,13 +12,13 @@ if [ "${TRAVIS_OS_NAME}" = linux ]; then # Ubuntu Linux
     PETSC_DIR=/usr/lib/petscdir/3.6.2/x86_64-linux-gnu-real \
     SLEPC_DIR=/usr/lib/slepcdir/3.6.1/x86_64-linux-gnu-real \
     HDF5_DIR=/usr/lib/x86_64-linux-gnu/hdf5/openmpi \
-    ../configure --prefix=${HOME}/libmesh --enable-perflog --enable-petsc-required --disable-examples --with-nlopt-include=/usr/include --with-nlopt-lib=/usr/lib/x86_64-linux-gnu
+    ../configure --prefix=${HOME}/libmesh --with-methods="opt dbg" --enable-perflog --enable-petsc-required --disable-examples --with-nlopt-include=/usr/include --with-nlopt-lib=/usr/lib/x86_64-linux-gnu
 
   elif [ "${TRAVIS_DIST}" = bionic ]; then # Ubuntu 18.04 Bionic Beaver
     PETSC_DIR=/usr/lib/petscdir/3.7.7/x86_64-linux-gnu-real \
     SLEPC_DIR=/usr/lib/slepcdir/3.7.4/x86_64-linux-gnu-real \
     HDF5_DIR=/usr/lib/x86_64-linux-gnu/hdf5/openmpi \
-    ../configure --prefix=${HOME}/libmesh --enable-perflog --enable-petsc-required --disable-examples --with-nlopt-include=/usr/include --with-nlopt-lib=/usr/lib/x86_64-linux-gnu
+    ../configure --prefix=${HOME}/libmesh --with-methods="opt dbg" --enable-perflog --enable-petsc-required --disable-examples --with-nlopt-include=/usr/include --with-nlopt-lib=/usr/lib/x86_64-linux-gnu
   
   else
     echo "INVALID LINUX DISTRO: ${TRAVIS_DIST}"
@@ -33,5 +33,5 @@ else
   exit 1
 fi
 
-#make 
+make -j 2
 #make install
