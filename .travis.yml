@@ -1,0 +1,53 @@
+language: cpp
+
+matrix:
+    include:
+      # macOS 10.14, XCode 11.2
+      - os: osx
+        osx_image: xcode10.2
+        #addons:
+        #  homebrew:
+        #    packages:
+        #      - petsc
+        #      - slepc
+        #      - hdf5
+        #      - boost
+        #      - nlopt
+
+      # Ubuntu Linux Version 16.04: Xenial Xerus
+      # - os: linux
+      #   dist: xenial
+      #   env: LIBMESH_VERSION=1.3.1
+      # - os: linux
+      #   dist: xenial
+      #   env: LIBMESH_VERSION=1.4.1
+      # - os: linux
+      #   dist: xenial
+      #   env: LIBMESH_VERSION=1.5.0  
+      
+      # Ubuntu Linux Version 18.04: Bionic Beaver
+      # - os: linux
+      #   dist: bionic
+      #   env: LIBMESH_VERSION=1.3.1
+      # - os: linux
+      #   dist: bionic
+      #   env: LIBMESH_VERSION=1.4.1
+      # - os: linux
+      #   dist: bionic
+      #   env: LIBMESH_VERSION=1.5.0
+      
+      
+      
+before_install:
+    # Unset CC/CXX for MPI: https://docs.travis-ci.com/user/languages/cpp/#mpi-projects
+    - test -n $CC  && unset CC 
+    - test -n $CXX && unset CXX
+    # Script to install dependencies for each platform
+    - libmesh/travis_ci/osx/install_dependencies.sh
+
+install:
+    - ci/get_libmesh.sh
+    - ci/build_libmesh.sh
+
+script:
+    - echo "Hello World"
