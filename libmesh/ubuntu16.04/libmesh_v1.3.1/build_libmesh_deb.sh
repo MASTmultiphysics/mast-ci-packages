@@ -26,7 +26,7 @@ cd build
 export PETSC_DIR=/usr/lib/petscdir/3.6.2/x86_64-linux-gnu-real
 export SLEPC_DIR=/usr/lib/slepcdir/3.6.1/x86_64-linux-gnu-real
 export HDF5_DIR=/usr/lib/x86_64-linux-gnu/hdf5/openmpi
-../configure --prefix=/usr/local --with-methods="opt dbg" --disable-metaphysicl --disable-examples
+../configure --prefix=/usr/local --with-methods="opt dbg" --disable-metaphysicl --disable-examples --enable-triangle=yes --enable-tetgen=yes --disable-strict-lgpl
 make -j ${NP}
 sudo make install
 
