@@ -1,0 +1,19 @@
+Package: libmesh-1.5.1
+Version: 1.5.1-1
+Section: base
+Priority: optional
+Architecture: amd64
+Depends: gfortran (>= 5.0),
+ openmpi-bin (>= 2.1), libopenmpi-dev (>= 2.1),
+ petsc-dev (>= 3.7), libpetsc3.7.7-dbg (>= 3.7),
+ slepc-dev (>= 3.7),
+ metis (>= 5.0), libmetis-dev (>= 5.0),
+ libparpack2-dev (>= 3.5), 
+ libboost-all-dev (>= 1.65), 
+ libeigen3-dev (>= 3.3)
+Maintainer: Joshua Deaton <jdeaton@users.noreply.github.com>
+Description: libMesh
+ The libMesh library provides a framework for the numerical simulation 
+ of partial differential equations using arbitrary unstructured discretizations 
+ on serial and parallel platforms. A major goal of the library is to provide 
+ while allowing a research scientist to focus on the physics they are modeling.
