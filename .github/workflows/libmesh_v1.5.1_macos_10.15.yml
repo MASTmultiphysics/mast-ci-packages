@@ -1,0 +1,159 @@
+name: libMesh-1.5.1 (macOS 10.15)
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events on any branch but only when this file is modified.
+on: 
+  push:
+    branches: 
+    paths:
+      - ".github/workflows/libmesh_v1.5.1_macos_10.15.yml"
+
+  pull_request:
+    branches:
+    paths:
+      - ".github/workflows/libmesh_v1.5.1_macos_10.15.yml"
+
+  # trigger manually from GitHub Actions tab
+  workflow_dispatch:
+
+jobs:
+  build_libmesh:
+    runs-on: macos-10.15
+    env: 
+      MY_WORK_PATH: ${{ github.workspace }}/work
+    steps:
+      - uses: actions/checkout@v2
+
+      # Print out some useful diagnostic info about the job/environment.
+      - name: Diagnostic info
+        run: |
+          echo "GITHUB_WORKFLOW: ${GITHUB_WORKFLOW}"
+          echo "Run #${GITHUB_RUN_NUMBER}"
+          echo "Run ID: ${GITHUB_RUN_ID}"
+          echo "Testing: ${GITHUB_REPOSITORY}"
+          echo "Triggered by (GITHUB_EVENT_NAME): ${GITHUB_EVENT_NAME}"
+          echo "Initiated by (GITHUB_ACTOR): ${GITHUB_ACTOR}"
+
+      # Configure dependencies available from Homebrew.
+      - name: Install Homebrew dependencies
+        run: |
+          brew reinstall gcc
+          brew install openmpi boost eigen nlopt metis
+      #    brew install \
+      #       openmpi \
+      #       metis \
+      #       petsc \
+      #       boost \
+      #       eigen \
+      #       nlopt \
+      #      doxygen graphviz  
+      #       texlive-latex-base dvi2ps ghostscript \
+      #       python3.7 python3.7-dev libpython3.7
+
+      - name: Compiler environment diagnostics
+        run: | 
+          echo "C COMPILER:"
+          echo "which cc: $(which cc)"
+          cc --version
+          printf '#include<stdio.h>\nint main(){printf("cc OK!\\n");}' > t.c && cc t.c && ./a.out && rm -f t.c a.out
+          echo ""
+          echo "C++ COMPILER:"
+          echo "which c++: $(which c++)"
+          c++ --version
+          printf '#include<iostream>\nint main(){std::cout<<"c++ OK!"<<std::endl;}' > t.cpp && c++ t.cpp && ./a.out && rm -f t.cpp a.out
+          echo ""
+          echo "FORTRAN COMPILER:"
+          echo "which gfortran: $(which gfortran)"
+          gfortran --version
+          printf 'program t\nprint"(a)","gfortran OK!"\nend program' > t.f90 && gfortran t.f90 && ./a.out && rm -f t.f90 a.out
+          echo ""
+          echo "MPI-wrapped C COMPILER:"
+          echo "which mpicc: $(which mpicc)"
+          mpicc --version
+          printf '#include<stdio.h>\nint main(){printf("mpicc OK!\\n");}' > t.c && mpicc t.c && ./a.out && rm -f t.c a.out
+          echo ""
+          echo "MPI-wrapped C++ COMPILER:"
+          echo "which mpic++: $(which mpic++)"
+          echo ""
+          mpic++ --version
+          printf '#include<iostream>\nint main(){std::cout<<"mpic++ OK!"<<std::endl;}' > t.cpp && mpic++ t.cpp && ./a.out && rm -f t.cpp a.out
+          echo "MPI-wrapped FORTRAN COMPILER:"
+          echo "which mpifort: $(which mpifort)"
+          mpifort --version
+          printf 'program t\nprint"(a)","mpifort OK!"\nend program' > t.f90 && mpifort t.f90 && ./a.out && rm -f t.f90 a.out
+
+      - name: Fetch PETSc (from GitLab, v3.16.1)
+        run: git clone -b v3.16.1 https://gitlab.com/petsc/petsc.git petsc
+          
+      - name: Fetch SLEPc (from GitLab, v3.16.1)
+        run: git clone -b v3.16.1 https://gitlab.com/slepc/slepc.git slepc
+          
+      # # Fetch/configure/install SLEPc
+      # - name: Install SLEPc
+      #   run: |
+      #     wget https://slepc.upv.es/download/distrib/slepc-3.16.1.tar.gz
+      #     tar -xf slepc-3.16.1.tar.gz
+      #     cd slepc-3.16.1
+      #     ls $(brew --prefix petsc)
+      #     export PETSC_DIR=$(brew --prefix petsc)
+      #     export SLEPC_DIR=${GITHUB_WORKSPACE}/slepc-3.16.1
+      #     echo ${SLEPC_DIR}
+      #     echo ${PETSC_DIR}
+      #     echo ${PWD}
+      #     echo $(which brew)
+      #     ./configure --prefix=${GITHUB_WORKSPACE}/install
+      #     make -j 1
+
+      # - name: Setup environment
+      #   run: |
+      #     export NP=2
+      #     mkdir work
+
+      # # Fetch/configure libMesh.
+      # # Note we currently have to use a modified version of the release with some updates to the libMesh
+      # # build to allow for a non-provided, non-PETSc version of metis provided by the Ubuntu repositories.
+      # - name: Fetch/configure libMesh
+      #   timeout-minutes: 10
+      #   run: |
+      #     cd work
+      #     git clone -b v1.5.1_with_build_updates --single-branch https://github.com/jdeaton/libmesh.git
+      #     cd libmesh
+      #     mkdir build
+      #     cd build
+      #     export PETSC_DIR=/usr/lib/petsc
+      #     export SLEPC_DIR=/usr/lib/slepc
+      #     ../configure --quiet --prefix=/usr/local --with-methods="opt devel dbg" --enable-cxx11-required --disable-metaphysicl --disable-examples --enable-triangle=yes --enable-tetgen=yes --disable-strict-lgpl --with-metis=/usr/lib/x86_64-linux-gnu --with-metis-include=/usr/include --with-nlopt-include=/usr/include --with-nlopt-lib=/usr/lib/x86_64-linux-gnu
+      
+      # - name: Make libMesh
+      #   timeout-minutes: 180
+      #   run: |
+      #     cd work/libmesh/build
+      #     make -j 1
+      #     sudo make install  
+
+      # - name: Package libMesh
+      #   run: |
+      #     # Organize libMesh include/ and lib/ for packaging.
+      #     cd ${WORK_DIR}
+      #     export PKG_DIR=libmesh-1.5.1-1
+      #     export INST_DIR=${PKG_DIR}/usr/local
+      #     mkdir ${PKG_DIR}
+      #     mkdir ${PKG_DIR}/usr
+      #     mkdir ${PKG_DIR}/usr/local
+      #     mkdir ${PKG_DIR}/usr/local/include
+      #     mkdir ${PKG_DIR}/usr/local/lib
+      #     cp -r /usr/local/include/* ${INST_DIR}/include
+      #     cp -r /usr/local/lib/libmesh* ${INST_DIR}/lib
+      #     cp -r /usr/local/lib/libnetcdf* ${INST_DIR}/lib
+
+      #     # Copy in DEBIAN/control package configuration file.
+      #     cp -r ${WORK_DIR}/DEBIAN ${PKG_DIR}
+
+      #     # Create libMesh .deb package.
+      #     dpkg-deb --build libmesh-1.5.1-1
+
+      # - name: Upload libMesh package artifact
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: libmesh-1.5.1-ubuntu20.04
+      #     path: cd ${WORK_DIR}/libmesh-1.5.1-1.deb
