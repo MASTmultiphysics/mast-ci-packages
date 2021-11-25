@@ -62,6 +62,8 @@ jobs:
         run: | 
           cd ${MY_WORK_PATH}
           git clone -b v1.6.2 --single-branch https://github.com/libMesh/libmesh.git
+          cd ${MY_WORK_PATH}/libmesh
+          git submodule update --init --recursive
       
       - name: Configure libMesh
         run: |

@@ -54,7 +54,7 @@ jobs:
             doxygen graphviz rsync
       
       - name: Setup working directory
-        run: mkdir ${GITHUB_WORKSPACE}/work
+        run: mkdir ${MY_WORK_PATH}
 
       # Note we currently have to use a modified version of the release with some updates to the libMesh
       # build to allow for a non-libMesh/contrib, non-PETSc version of metis provided by the Ubuntu repositories.
