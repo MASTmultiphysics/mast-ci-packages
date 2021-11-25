@@ -11,7 +11,7 @@ Depends: gfortran (>= 5.0),
  libparpack2-dev (>= 3.5), 
  libboost-all-dev (>= 1.65), 
  libeigen3-dev (>= 3.3),
- libnlopt-dev (>= 2.6)
+ libnlopt-dev (>= 2.4)
 Maintainer: Joshua Deaton <jdeaton@users.noreply.github.com>
 Description: libMesh
  The libMesh library provides a framework for the numerical simulation 
