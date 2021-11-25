@@ -93,6 +93,7 @@ jobs:
           mkdir ${PKG_DIR}/usr/local/lib
           cp -r /usr/local/include/* ${INST_DIR}/include
           cp -r /usr/local/lib/libmesh* ${INST_DIR}/lib
+          cp -r /usr/local/lib/libtimpi* ${INST_DIR}/lib
           cp -r /usr/local/lib/libnetcdf* ${INST_DIR}/lib
 
           # Copy in DEBIAN/control package configuration file.
