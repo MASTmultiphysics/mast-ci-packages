@@ -82,7 +82,7 @@ jobs:
       - name: Package libMesh into .deb
         run: |
           # Organize libMesh include/ and lib/ for packaging.
-          export PKG_DIR=libmesh-1.5.1-1
+          export PKG_DIR=libmesh-1.5.1-2
           export INST_DIR=${PKG_DIR}/usr/local
           mkdir ${PKG_DIR}
           mkdir ${PKG_DIR}/usr
@@ -97,10 +97,10 @@ jobs:
           cp -r ${GITHUB_WORKSPACE}/libmesh/ubuntu20.04_focal/libmesh_v1.5.1/DEBIAN ${PKG_DIR}
 
           # Create libMesh .deb package.
-          dpkg-deb --build libmesh-1.5.1-1
+          dpkg-deb --build libmesh-1.5.1-2
 
       - name: Upload libMesh package artifact
         uses: actions/upload-artifact@v2
         with:
-          name: libmesh-1.5.1.deb-ubuntu20.04
-          path: libmesh-1.5.1-1.deb
+          name: libmesh-1.5.1-2.deb-ubuntu20.04
+          path: libmesh-1.5.1-2.deb
