@@ -46,7 +46,6 @@ jobs:
             slepc-dev python3-slepc4py \
             libparpack2-dev \
             libmetis-dev \
-            libnetcdf-dev \
             libboost-all-dev \
             libeigen3-dev \
             libnlopt-dev \
@@ -72,8 +71,10 @@ jobs:
           cd build
           export PETSC_DIR=/usr/lib/petsc
           export SLEPC_DIR=/usr/lib/slepc
-          ../configure --quiet --prefix=/usr/local --with-methods="opt devel dbg" --enable-cxx11-required --disable-metaphysicl --disable-examples --enable-triangle=yes --enable-tetgen=yes --disable-strict-lgpl --with-metis=/usr/lib/x86_64-linux-gnu --with-metis-include=/usr/include --with-nlopt-include=/usr/include --with-nlopt-lib=/usr/lib/x86_64-linux-gnu
+          ../configure --quiet --prefix=/usr/local --with-methods="opt devel dbg" --enable-cxx11-required --disable-metaphysicl --disable-examples --disable-netcdf-4 --enable-triangle=yes --enable-tetgen=yes --disable-strict-lgpl --with-metis=/usr/lib/x86_64-linux-gnu --with-metis-include=/usr/include --with-nlopt-include=/usr/include --with-nlopt-lib=/usr/lib/x86_64-linux-gnu
+      # ../configure --quiet --prefix=/usr/local --with-methods="opt devel dbg" --enable-cxx11-required --disable-metaphysicl --disable-examples --enable-triangle=yes --enable-tetgen=yes --disable-strict-lgpl --with-metis=/usr/lib/x86_64-linux-gnu --with-metis-include=/usr/include --with-nlopt-include=/usr/include --with-nlopt-lib=/usr/lib/x86_64-linux-gnu
   
+
       - name: Compile/install libMesh
         timeout-minutes: 180
         run: |
