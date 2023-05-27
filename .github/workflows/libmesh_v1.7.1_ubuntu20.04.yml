@@ -1,0 +1,112 @@
+name: libMesh-1.7.1.deb (Ubuntu 20.04)
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events on any branch but only when this file is modified.
+on: 
+  push:
+    branches: 
+    paths:
+      - ".github/workflows/libmesh_v1.7.1_ubuntu20.04.yml"
+
+  pull_request:
+    branches:
+    paths:
+      - ".github/workflows/libmesh_v1.7.1_ubuntu20.04.yml"
+
+  # trigger manually from GitHub Actions tab
+  workflow_dispatch:
+
+jobs:
+  build_libmesh:
+    runs-on: ubuntu-20.04
+    env: 
+      MY_WORK_PATH: ${{ github.workspace }}/work
+    steps:
+      - uses: actions/checkout@v2
+
+      # Print out some useful diagnostic info about the job/environment.
+      - name: Diagnostic info
+        run: |
+          echo "GITHUB_WORKFLOW: ${GITHUB_WORKFLOW}"
+          echo "Run #${GITHUB_RUN_NUMBER}"
+          echo "Run ID: ${GITHUB_RUN_ID}"
+          echo "Testing: ${GITHUB_REPOSITORY}"
+          echo "Triggered by (GITHUB_EVENT_NAME): ${GITHUB_EVENT_NAME}"
+          echo "Initiated by (GITHUB_ACTOR): ${GITHUB_ACTOR}"
+
+      # Update packages fromt apt repos.
+      - name: Install APT dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get -qq install -y \
+            build-essential gfortran wget less m4 git cmake \
+            python3-all python3-all-dev python3-all-dbg \
+            openmpi-bin libopenmpi-dev python3-mpi4py python3-mpi4py-dbg \
+            petsc-dev python3-petsc4py \
+            slepc-dev python3-slepc4py \
+            libparpack2-dev \
+            libmetis-dev \
+            libboost-all-dev \
+            libeigen3-dev \
+            libnlopt-dev \
+            libadolc-dev \
+            doxygen graphviz rsync
+      
+      - name: Setup working directory
+        run: mkdir ${MY_WORK_PATH}
+
+      # Note we currently have to use a modified version of the release with some updates to the libMesh
+      # build to allow for a non-libMesh/contrib, non-PETSc version of metis provided by the Ubuntu repositories.
+      - name: Fetch libMesh
+        run: | 
+          cd ${MY_WORK_PATH}
+          git clone -b v1.7.1 --single-branch https://github.com/libMesh/libmesh.git
+          cd ${MY_WORK_PATH}/libmesh
+          git submodule update --init --recursive
+      
+      - name: Configure libMesh
+        run: |
+          cd ${MY_WORK_PATH}/libmesh
+          mkdir build
+          cd build
+          export PETSC_DIR=/usr/lib/petsc
+          export SLEPC_DIR=/usr/lib/slepc
+          ../configure --quiet --prefix=/usr/local --with-methods="opt devel dbg" --enable-cxx11-required --disable-metaphysicl --disable-examples --disable-netcdf-4 --enable-triangle=yes --enable-tetgen=yes --disable-strict-lgpl --with-metis=/usr/lib/x86_64-linux-gnu --with-metis-include=/usr/include --with-nlopt-include=/usr/include --with-nlopt-lib=/usr/lib/x86_64-linux-gnu
+        # ../configure --quiet --prefix=/usr/local --with-methods="opt devel dbg" --enable-cxx11-required --disable-metaphysicl --disable-examples --enable-triangle=yes --enable-tetgen=yes --disable-strict-lgpl --with-metis=/usr/lib/x86_64-linux-gnu --with-metis-include=/usr/include --with-nlopt-include=/usr/include --with-nlopt-lib=/usr/lib/x86_64-linux-gnu
+  
+
+      - name: Compile/install libMesh
+        timeout-minutes: 180
+        run: |
+          cd ${MY_WORK_PATH}/libmesh/build
+          make -j 1
+          sudo make install  
+
+      - name: Package libMesh into .deb
+        run: |
+          # Organize libMesh include/ and lib/ for packaging.
+          export PKG_DIR=libmesh-1.7.1-1_amd64
+          export INST_DIR=${PKG_DIR}/usr/local
+          mkdir ${PKG_DIR}
+          mkdir ${PKG_DIR}/usr
+          mkdir ${PKG_DIR}/usr/local
+          mkdir ${PKG_DIR}/usr/local/include
+          mkdir ${PKG_DIR}/usr/local/lib
+          cp -r /usr/local/include/* ${INST_DIR}/include
+          cp -r /usr/local/lib/libmesh* ${INST_DIR}/lib
+          cp -r /usr/local/lib/libtimpi* ${INST_DIR}/lib
+          cp -r /usr/local/lib/libnetcdf* ${INST_DIR}/lib
+
+          # Copy in DEBIAN/control package configuration file.
+          cp -r ${GITHUB_WORKSPACE}/libmesh/ubuntu20.04_focal/libmesh_v1.7.1/DEBIAN ${PKG_DIR}
+
+          # Create libMesh .deb package.
+          dpkg-deb --build libmesh-1.7.1-1_amd64
+          
+
+
+      - name: Upload libMesh package artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: libmesh-1.7.1-1_amd64.deb-ubuntu20.04
+          path: libmesh-1.7.1-1_amd64.deb
